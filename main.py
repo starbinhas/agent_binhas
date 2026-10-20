@@ -27,7 +27,7 @@ while True:
         print("\nGoodbye!")
         break
 
-    if user_input.lower == "exit":
+    if user_input.lower() == "exit":
         print("Goodbye!")
         break
 
