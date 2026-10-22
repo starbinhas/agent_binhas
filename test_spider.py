@@ -12,7 +12,7 @@ zap = ZAPv2(
     apikey=os.environ["ZAP_API_KEY"],
     proxies={
         "http": "http://127.0.0.1:8080",
-        "https": "https://127.0.0.1:8080"
+        "https": "http://127.0.0.1:8080"
     }
 )
 
@@ -20,7 +20,8 @@ print("Starting spider...")
 
 scan_id = zap.spider.scan(
     url=TARGET,
-    recurse=True
+    recurse=True,
+    subtreeonly=True
 )
 
 print(f"Scan ID: {scan_id}")
@@ -35,3 +36,6 @@ while True:
     time.sleep(1)
 
 urls = zap.spider.results(scan_id)
+
+for url in urls:
+    print(url)
