@@ -22,7 +22,8 @@ def crawl_website(url: str) -> list:
     scan_id = zap.spider.scan(
         url=url,
         recurse=True,
-        subtreeonly=True
+        subtreeonly=True,
+        maxchildren=10
     )
 
     while int(zap.spider.status(scan_id)) < 100:    # is this good?
