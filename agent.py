@@ -1,3 +1,4 @@
+import json
 from ollama import chat
 
 class Agent:
@@ -58,7 +59,7 @@ class Agent:
                 self.messages.append({
                     "role": "tool",
                     "tool_name": name,
-                    "content": str(result)
+                    "content": json.dumps(result)
                 })
 
-            return "Maximum tool rounds reached."
+        return "Maximum tool rounds reached."

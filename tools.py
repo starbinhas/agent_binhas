@@ -7,7 +7,13 @@ from zapv2 import ZAPv2
 def sum_calculator(a: float, b: float) -> float:
     return a + b
 
-def crawl_website(url: str) -> list:
+def crawl_website(url: str) -> dict:
+    """
+        Craw a website using ZAP's Traditional Spider and return discovered URLs.
+
+        Args:
+            url: The website URL to crawl.
+    """
     
     load_dotenv()   # this seens wrong
 
