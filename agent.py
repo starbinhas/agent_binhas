@@ -44,15 +44,9 @@ class Agent:
                 print(f"\n[Agent] Calling: {name}")
                 print(f"\n[Agent] Arguments: {args}")
 
-                function = self.tools.get(name)
+                function = self.tools[name]
 
-                if function is None:
-                    result = f"Error: Unknown tool'{name}'"
-                else:
-                    try:
-                        result = function(**args)
-                    except (TypeError, ValueError) as error:
-                        result = f"Tool error: {error}"
+                result = function(**args)
 
                 print(f"[Agent] Tool result: {result}")
 
@@ -62,4 +56,4 @@ class Agent:
                     "content": json.dumps(result)
                 })
 
-        return "Maximum tool rounds reached."
+        return "Max tool rounds reached."

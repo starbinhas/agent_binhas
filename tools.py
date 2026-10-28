@@ -1,11 +1,14 @@
 import os
 import time
+import json
+import subprocess
 
 from dotenv import load_dotenv
 from zapv2 import ZAPv2
+from tempfile import TemporaryDirectory
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
-def sum_calculator(a: float, b: float) -> float:
-    return a + b
 
 def crawl_website(url: str) -> dict:
     """
@@ -43,3 +46,29 @@ def crawl_website(url: str) -> dict:
         "total_urls": len(urls),
         "urls": urls,
     }
+
+def discover_get_parameters(url: str) -> dict:
+    """
+    Discover GET query parameters accepted by a web endpoint using Arjun.
+    {} means no parameters discovered.
+    
+    Args:
+        url: The endpoint URL to analyse.
+    """
+
+    with TemporaryDirectory() as temp_dir:
+        output_file = Path(temp_dir) / "results.json"
+
+        command = [
+            "arjun",
+            "-u", url,
+            "-m", "GET",
+            "-o", str(output_file)
+        ]
+
+        process = subprocess.run(command)
+
+        if output_file.exists():
+            return json.loads(output_file.read_text())
+
+        return {}
