@@ -40,5 +40,30 @@ TOOL_SCHEMAS = [
                 "additionalProperties": False
             }
         }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "test_sql_injection",
+            "description": (
+                "Test an HTTP parameter for SQL injection using sqlmap. "
+                "Return detection results."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "type": "string",
+                        "description": "Target URL including query parameters."
+                    },
+                    "parameter": {
+                        "type": "string",
+                        "description": "Parameter name to test for SQL injection."
+                    }
+                },
+                "required": ["url", "parameter"],
+                "additionalProperties": False
+            }
+        }
     }
 ]

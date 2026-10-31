@@ -11,12 +11,6 @@ from tempfile import TemporaryDirectory
 
 
 def crawl_website(url: str) -> dict:
-    """
-        Craw a website using ZAP's Traditional Spider and return discovered URLs.
-
-        Args:
-            url: The website URL to crawl.
-    """
     
     load_dotenv()   # this seens wrong
 
@@ -48,13 +42,6 @@ def crawl_website(url: str) -> dict:
     }
 
 def discover_get_parameters(url: str) -> dict:
-    """
-    Discover GET query parameters accepted by a web endpoint using Arjun.
-    {} means no parameters discovered.
-    
-    Args:
-        url: The endpoint URL to analyse.
-    """
 
     with TemporaryDirectory() as temp_dir:
         output_file = Path(temp_dir) / "results.json"
@@ -72,3 +59,22 @@ def discover_get_parameters(url: str) -> dict:
             return json.loads(output_file.read_text())
 
         return {}
+
+def test_sql_injection(url: str, parameter: str) -> dict:
+    
+    with TemporaryDirectory() as temp_dir:
+        output_file = Path(temp_dir) / "sqlmap.json"
+
+        command = [
+            "sqlmap",
+            "-u", url,
+            "-p", parameter,
+            "--level=3",
+            "--risk=1",
+            "--batch",
+            "--report-json", str(output_file)
+        ]
+
+        subprocess.run(command)
+
+        return json.loads(output_file.read_text())
