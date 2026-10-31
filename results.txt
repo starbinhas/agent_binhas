@@ -1,8 +1,0 @@
-
-Agent Binhas is ready! Enter a prompt:
-
-[orchestrator]: The task "perform a WAPT" (Web Application Penetration Test) is not directly supported by the available tools. However, I can assist with reconnaissance tasks such as mapping the website and discovering GET parameters. Let's start by mapping the target website. 
-
-Please run the `crawl_website` task on `http://localhost:3000`.
-
-...End of WAPT...

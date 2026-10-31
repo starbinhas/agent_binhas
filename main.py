@@ -88,7 +88,15 @@ worker = Agent(
 
 )
 
-prompt = input("\nAgent Binhas is ready!\n")
+target = input("\nenter the target URL: ")
+print(target)
+
+prompt = (
+    f"Perform authorized web application reconnaissance against {target}. "
+    "Start by crawling the website, then discover GET parameters on relevant endpoints. "
+    "Delegate tasks to the worker and evaluate its results. "
+    "Finish when no further supported tasks remain."
+)
 
 while True:
 

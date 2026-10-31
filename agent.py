@@ -1,11 +1,15 @@
 import json
-from ollama import chat
+
+from groq import Groq
+
 
 class Agent:
 
-    def __init__(self, model, tools, system_prompt):
+    def __init__(self, model, tools, system_prompt, tool_schemas=None):
+        self.client = Groq()
         self.model = model
         self.tools = tools
+        self.tool_schemas = tool_schemas or []
 
         self.messages = [
             {
@@ -15,7 +19,6 @@ class Agent:
         ]
 
     def ask(self, user_input):
-
         self.messages.append({
             "role": "user",
             "content": user_input
@@ -25,12 +28,21 @@ class Agent:
 
         for _ in range(max_rounds):
 
-            response = chat(
-                model=self.model,
-                messages=self.messages,
-                tools=list(self.tools.values()),
-                think=False
+            response = self.client.chat.completions.create(
+                {
+                    "model": self.model,
+                    "messages": self.messages,
+                    "tools": self.tool_schemas,
+                    "tool_choice": "auto"
+                }
             )
+
+            message = response.choices[0].message
+
+            assistant_message = {
+                "role": "assistant",
+                "content": message.content or ""
+            }
 
             self.messages.append(response.message)
 
