@@ -27,44 +27,61 @@ class Agent:
         max_rounds = 5
 
         for _ in range(max_rounds):
+            request = {
+                "model": self.model,
+                "messages": self.messages
+            }
 
-            response = self.client.chat.completions.create(
-                {
-                    "model": self.model,
-                    "messages": self.messages,
-                    "tools": self.tool_schemas,
-                    "tool_choice": "auto"
-                }
-            )
+            if self.tool_schemas:   # at the end, every agent will have tools and there will be no need for this check
+                request["tools"] = self.tool_schemas
+                request["tool_choice"] = "auto"
 
+            response = self.client.chat.completions.create(**request)
             message = response.choices[0].message
+
+            print(f"[agent response message]\n{message}\n\n")
 
             assistant_message = {
                 "role": "assistant",
-                "content": message.content or ""
+                "content": message.content
             }
 
-            self.messages.append(response.message)
+            if message.tool_calls:      # does really need to add "tool_calls"? Isn't it in message already?
+                assistant_message["tool_calls"] = [
+                    tool_call.model_dump(exclude_none=True)
+                    for tool_call in message.tool_calls
+                ]
 
-            if not response.message.tool_calls:
-                return response.message.content
+            self.messages.append(assistant_message)
 
-            for tool_call in response.message.tool_calls:
+            if not message.tool_calls:
+                return message.content or ""    # is it possible to the LLM to return None?
+
+            for tool_call in message.tool_calls:
                 name = tool_call.function.name
-                args = tool_call.function.arguments
+                arguments = tool_call.function.arguments
 
-                print(f"\n[Agent] Calling: {name}")
-                print(f"\n[Agent] Arguments: {args}")
+                try:
+                    args = json.loads(arguments)
+                    function = self.tools[name]
 
-                function = self.tools[name]
+                    print(f"\n[Agent] Calling: {name}")
+                    print(f"[Agent] Arguments: {args}")
 
-                result = function(**args)
+                    result = function(**args)
+
+                except (ValueError, TypeError, KeyError, OSError) as error:     # is this error handler good?
+                    result = {
+                        "error": str(error),
+                        "status": "failed"
+                    }
 
                 print(f"[Agent] Tool result: {result}")
 
                 self.messages.append({
                     "role": "tool",
-                    "tool_name": name,
+                    "tool_call_id": tool_call.id,
+                    "name": name,
                     "content": json.dumps(result)
                 })
 

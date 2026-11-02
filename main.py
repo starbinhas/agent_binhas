@@ -1,14 +1,19 @@
+from dotenv import load_dotenv
+
 from agent import Agent
-from tools import crawl_website, discover_get_parameters
+from tool_schemas import TOOL_SCHEMAS
+from tools import crawl_website, discover_get_parameters, test_sql_injection
+
+load_dotenv()
 
 TOOLS = {
     "crawl_website": crawl_website,
-    "discover_get_parameters": discover_get_parameters
+    "discover_get_parameters": discover_get_parameters,
+    "test_sql_injection": test_sql_injection
 }
 
 orchestrator = Agent(
-    model="qwen3:8b",
-    tools={},
+    model="openai/gpt-oss-120b",
     system_prompt="""
         You are the orchestrator of an autonomous web application
         security assessment system.
@@ -19,8 +24,8 @@ orchestrator = Agent(
         You do not execute security tools yourself. The worker has
         access to:
         - crawl_website: discovers website URLs using OWASP ZAP.
-        - discover_get_parameters: discovers GET query parameters
-        using Arjun.
+        - discover_get_parameters: discovers GET query parameters using Arjun.
+        - test_sql_injection: tests a specified HTTP parameter for SQL injection using sqlmap and reports detection evidence.
 
         Workflow:
         1. Read the user's objective and target website.
@@ -45,8 +50,9 @@ orchestrator = Agent(
 )
 
 worker = Agent(
-    model="qwen3:8b",
+    model="openai/gpt-oss-120b",
     tools=TOOLS,
+    tool_schemas=TOOL_SCHEMAS,
     system_prompt="""
         You are a technical worker agent performing authorized
         web application security reconnaissance.
@@ -79,11 +85,11 @@ worker = Agent(
         TASK: What was performed.
         TARGET: The URL analyzed.
         RESULTS: The actual findings.
-        STATUS: Completed, failed, or incomplete.orchestrator after reporting
+        STATUS: Completed, failed or incomplete.
         LIMITATIONS: Any important limitations of the results.
 
         Do not assign yourself additional tasks.
-        Return control to the .
+        Return control to the orchestrator after reporting.
     """
 
 )
@@ -98,15 +104,20 @@ prompt = (
     "Finish when no further supported tasks remain."
 )
 
-while True:
+max_tasks = 10  # is it good to have a task limit?
 
-    prompt = orchestrator.ask(prompt)
-    print(f"\n[orchestrator]: {prompt}")
+for _ in range(max_tasks):
+    task = orchestrator.ask(prompt).strip()     # why use strip()?
 
-    if prompt == "exit":
+    print(f"\n[orchestrator]: {task}")
+
+    if task.lower() == "exit":      # why use lower()?
         break
 
-    prompt = worker.ask(prompt)
-    print(f"[worker]: {prompt}")
+    report = worker.ask(task)
+
+    print(f"\n[worker]: {report}")
+
+    prompt = report
 
 print("\n...End of WAPT...")
