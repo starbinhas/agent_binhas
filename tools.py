@@ -8,6 +8,7 @@ from zapv2 import ZAPv2
 from tempfile import TemporaryDirectory
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from shutil import which
 
 
 def crawl_website(url: str) -> dict:
@@ -46,6 +47,7 @@ def crawl_website(url: str) -> dict:
         "urls": urls
     }
 
+
 def discover_get_parameters(url: str) -> dict:
 
     with TemporaryDirectory() as temp_dir:
@@ -64,6 +66,7 @@ def discover_get_parameters(url: str) -> dict:
             return json.loads(output_file.read_text())
 
         return {}
+    
 
 def test_sql_injection(url: str, parameter: str) -> dict:
     
@@ -83,3 +86,31 @@ def test_sql_injection(url: str, parameter: str) -> dict:
         subprocess.run(command)
 
         return json.loads(output_file.read_text())
+
+
+def crawl_with_katana(url : str) -> dict:
+
+    browser = which("chromium")
+
+    if not browser:
+        return {"error": "Chromium executable not found."}
+
+    with TemporaryDirectory() as temp_dir:
+        output_file = Path(temp_dir) / "katana.jsonl"
+
+        command = [
+            "katana",
+            "u", url,
+            "-jc",
+            "-hl",
+            "-scp", browser,
+            "-d", "3",
+            "-jsonl",
+            "-or",
+            "-ob",
+            "-o", str(output_file)
+        ]
+
+        process = subprocess.run(command)
+
+        return {"output": output_file.read_text()}   # need to improve this return
