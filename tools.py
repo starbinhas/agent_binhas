@@ -26,19 +26,24 @@ def crawl_website(url: str) -> dict:
         url=url,
         recurse=True,
         subtreeonly=True,
-        maxchildren=10
     )
 
     while int(zap.spider.status(scan_id)) < 100:    # is this good?
         print(f"web_crawler: {zap.spider.status(scan_id)}%")
         time.sleep(1)
 
-    urls = zap.spider.results(scan_id)
+    spider_urls = zap.spider.results(scan_id)
+    observed_urls = zap.core.urls(baseurl=url)
+
+    urls = sorted(set(spider_urls + observed_urls))
+
+    if "http://localhost:3000/rest/products/search?q=" in urls:     # only for testing, remove later
+        urls = urls[:49] + {"http://localhost:3000/rest/products/search?q="}
 
     return {
         "target": url,
         "total_urls": len(urls),
-        "urls": urls,
+        "urls": urls
     }
 
 def discover_get_parameters(url: str) -> dict:

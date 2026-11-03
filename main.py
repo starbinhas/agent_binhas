@@ -120,4 +120,4 @@ for _ in range(max_tasks):
 
     prompt = report
 
-print("\n...End of WAPT...")
+print("\n[End of WAPT]")

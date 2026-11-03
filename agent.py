@@ -5,7 +5,7 @@ from groq import Groq
 
 class Agent:
 
-    def __init__(self, model, tools, system_prompt, tool_schemas=None):
+    def __init__(self, model, system_prompt, tools=None, tool_schemas=None):
         self.client = Groq()
         self.model = model
         self.tools = tools
@@ -19,7 +19,7 @@ class Agent:
         ]
 
     def ask(self, user_input):
-        self.messages.append({
+        self.messages.append({      # are messages really a simple as this? maybe can have "reasoning" key
             "role": "user",
             "content": user_input
         })
@@ -38,8 +38,6 @@ class Agent:
 
             response = self.client.chat.completions.create(**request)
             message = response.choices[0].message
-
-            print(f"[agent response message]\n{message}\n\n")
 
             assistant_message = {
                 "role": "assistant",
