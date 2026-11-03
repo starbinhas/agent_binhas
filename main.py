@@ -2,12 +2,13 @@ from dotenv import load_dotenv
 
 from agent import Agent
 from tool_schemas import TOOL_SCHEMAS
-from tools import crawl_website, discover_get_parameters, test_sql_injection
+from tools import crawl_website, discover_get_parameters, test_sql_injection, crawl_with_katana
 
 load_dotenv()
 
 TOOLS = {
     "crawl_website": crawl_website,
+    "crawl_with_katana": crawl_with_katana,
     "discover_get_parameters": discover_get_parameters,
     "test_sql_injection": test_sql_injection
 }
@@ -21,11 +22,10 @@ orchestrator = Agent(
         Your responsibility is to coordinate reconnaissance tasks
         and evaluate the results reported by a worker agent.
 
-        You do not execute security tools yourself. The worker has
-        access to:
-        - crawl_website: discovers website URLs using OWASP ZAP.
-        - discover_get_parameters: discovers GET query parameters using Arjun.
-        - test_sql_injection: tests a specified HTTP parameter for SQL injection using sqlmap and reports detection evidence.
+        You do not execute security tools yourself. The worker has access to:
+        - crawl_with_katana: discovers URLs using Katana, including JavaScript extraction and headless browser crawling.
+        - discover_get_parameters: discovers GET parameters using Arjun.
+        - test_sql_injection: tests parameters for SQL injection using sqlmap.
 
         Workflow:
         1. Read the user's objective and target website.
@@ -60,9 +60,9 @@ worker = Agent(
         You receive specific tasks from an orchestrator agent.
 
         Available tools:
-        - crawl_website: discovers website URLs using OWASP ZAP.
-        - discover_get_parameters: discovers GET query parameters
-        accepted by a web endpoint using Arjun.
+        - crawl_with_katana: discovers URLs using Katana, including JavaScript extraction and headless browser crawling.
+        - discover_get_parameters: discovers GET parameters using Arjun.
+        - test_sql_injection: tests parameters for SQL injection using sqlmap.
 
         Responsibilities:
         1. Understand the current task assigned by the orchestrator.

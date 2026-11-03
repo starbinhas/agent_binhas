@@ -65,5 +65,27 @@ TOOL_SCHEMAS = [
                 "additionalProperties": False
             }
         }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "crawl_with_katana",
+            "description": (
+                "Discover website URLs using Katana, including "
+                "JavaScript and headless browser crawling. "
+                "Useful for modern single-page applications."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "type": "string",
+                        "description": "The target website URL to crawl."
+                    }
+                },
+                "required": ["url"],
+                "additionalProperties": False
+            }
+        }
     }
 ]

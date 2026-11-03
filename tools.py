@@ -2,6 +2,7 @@ import os
 import time
 import json
 import subprocess
+import re   # only for testing, remove later
 
 from dotenv import load_dotenv
 from zapv2 import ZAPv2
@@ -100,7 +101,7 @@ def crawl_with_katana(url : str) -> dict:
 
         command = [
             "katana",
-            "u", url,
+            "-u", url,
             "-jc",
             "-hl",
             "-scp", browser,
@@ -113,4 +114,15 @@ def crawl_with_katana(url : str) -> dict:
 
         process = subprocess.run(command)
 
-        return {"output": output_file.read_text()}   # need to improve this return
+        output = output_file.read_text()
+
+        urls = sorted(set(re.findall(       # only because of groq api limits, remove later
+            r'"http://localhost.*?"',
+            output
+        )))
+
+        return {        # improve this return
+            "target": url,
+            "total_urls": len(urls),
+            "urls": urls
+        }
