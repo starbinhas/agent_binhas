@@ -1,12 +1,12 @@
 import json
 
-from groq import Groq
+from openai import OpenAI
 
 
 class Agent:
 
     def __init__(self, model, system_prompt, tools=None, tool_schemas=None):
-        self.client = Groq()
+        self.client = OpenAI()
         self.model = model
         self.tools = tools
         self.tool_schemas = tool_schemas or []

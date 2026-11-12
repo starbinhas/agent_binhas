@@ -14,7 +14,7 @@ TOOLS = {
 }
 
 orchestrator = Agent(
-    model="openai/gpt-oss-120b",
+    model="gpt-4o-mini",
     system_prompt="""
         You are the orchestrator of an autonomous web application
         security assessment system.
@@ -50,7 +50,7 @@ orchestrator = Agent(
 )
 
 worker = Agent(
-    model="openai/gpt-oss-120b",
+    model="gpt-4o-mini",
     tools=TOOLS,
     tool_schemas=TOOL_SCHEMAS,
     system_prompt="""
